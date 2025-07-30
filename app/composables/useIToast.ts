@@ -1,3 +1,5 @@
+import type { ButtonProps } from "@nuxt/ui";
+
 export const useIToast = () => {
   const defaultNotifiers: Record<string, any> = {
     success: {
@@ -27,29 +29,46 @@ export const useIToast = () => {
   const onNotifier = (
     id: string,
     title: string | number,
-    description?: string
+    description?: string,
+    actions?: ButtonProps[],
   ) =>
     toast.add({
       icon: defaultNotifiers[id].icon,
       color: defaultNotifiers[id].color,
       title: title.toString(),
       description,
+      actions,
       ui: {
         icon: "shrink-0 w-10 h-10",
         title: `text-base font-semibold text-${defaultNotifiers[id].color}-500 dark:text-white`,
       },
     });
 
-  const onSuccess = (title: string | number, description?: string) =>
-    onNotifier("success", title, description);
-  const onInfo = (title: string | number, description?: string) =>
-    onNotifier("info", title, description);
-  const onWarning = (title: string | number, description?: string) =>
-    onNotifier("warning", title, description);
-  const onError = (title: string | number, description?: string) =>
-    onNotifier("error", title, description);
-  const onDelete = (title: string | number, description?: string) =>
-    onNotifier("delete", title, description);
+  const onSuccess = (
+    title: string | number,
+    description?: string,
+    actions?: ButtonProps[],
+  ) => onNotifier("success", title, description, actions);
+  const onInfo = (
+    title: string | number,
+    description?: string,
+    actions?: ButtonProps[],
+  ) => onNotifier("info", title, description, actions);
+  const onWarning = (
+    title: string | number,
+    description?: string,
+    actions?: ButtonProps[],
+  ) => onNotifier("warning", title, description, actions);
+  const onError = (
+    title: string | number,
+    description?: string,
+    actions?: ButtonProps[],
+  ) => onNotifier("error", title, description, actions);
+  const onDelete = (
+    title: string | number,
+    description?: string,
+    actions?: ButtonProps[],
+  ) => onNotifier("delete", title, description, actions);
   const onCustom = (options: NotificationOptions) => toast.add(options);
 
   return { onSuccess, onInfo, onWarning, onError, onDelete, onCustom };

@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { capitalize } from "lodash";
+import type { NavigationMenuItem, DropdownMenuItem } from "@nuxt/ui";
+
 const { t } = useI18n();
 const localePath = useLocalePath();
 const side = sidebar();
 const auth = authen();
+const ct = cart();
 
 const breadcrumbItems = breadcrumbs();
 
@@ -11,20 +14,42 @@ const toggleDrawer = () => {
   side.drawer = !side.drawer;
 };
 
-const profileItems = [
+const showSidebar = computed(
+  () => auth.isAdmin() && useRoute().name?.toString().includes("admin"),
+);
+
+const profileItems: DropdownMenuItem[][] = [
   [
     {
       slot: "account",
       disabled: true,
       label: "",
     },
-    {
-      label: t("LOGOUT"),
-      icon: "i-fa6-solid-right-from-bracket",
-      to: localePath({ name: "logout" }),
-    },
   ],
 ];
+if (auth.isAdmin() && profileItems[0]) {
+  profileItems[0].push({
+    label: "Admin Management",
+    icon: "i-fa6-solid-shield-halved",
+    to: localePath({ name: "admin" }),
+  });
+}
+
+profileItems.push([
+  {
+    label: t("LOGOUT"),
+    icon: "i-fa6-solid-right-from-bracket",
+    to: localePath({ name: "logout" }),
+  },
+]);
+
+const items = ref<NavigationMenuItem[]>([
+  {
+    label: "สินค้าทั้งหมด",
+    icon: "i-fa6-solid-box",
+    to: localePath({ name: "products" }),
+  },
+]);
 </script>
 
 <template>
@@ -34,7 +59,7 @@ const profileItems = [
     <div class="flex items-center justify-between bg-white px-5 py-2 shadow-sm">
       <div class="flex items-center gap-3">
         <UButton
-          v-if="auth.isAdmin()"
+          v-if="showSidebar"
           class="lg:hidden"
           color="neutral"
           variant="ghost"
@@ -44,8 +69,24 @@ const profileItems = [
         <NuxtLink :to="useLocalePath()({ name: 'index' })">
           <img src="/images/logo.png" class="h-[30px] shrink-0" />
         </NuxtLink>
+        <UNavigationMenu :items :class="showSidebar ? 'lg:ml-52' : ''" />
       </div>
       <div class="flex items-center gap-2">
+        <UChip v-if="ct.cart.length > 0" :text="ct.cart.length" size="3xl">
+          <UButton
+            icon="i-fa6-solid-cart-shopping"
+            color="neutral"
+            variant="ghost"
+            :to="localePath({ name: 'cart' })"
+          />
+        </UChip>
+        <UButton
+          v-else
+          icon="i-fa6-solid-cart-shopping"
+          color="neutral"
+          variant="ghost"
+          :to="localePath({ name: 'cart' })"
+        />
         <UDropdownMenu
           :items="profileItems"
           :content="{
@@ -92,7 +133,7 @@ const profileItems = [
     <UBreadcrumb
       v-if="breadcrumbItems.hasItem()"
       :items="breadcrumbItems.items"
-      :class="['px-10 py-1.5', auth.isAdmin() ? 'lg:ml-72' : '']"
+      :class="['px-10 py-1.5', showSidebar ? 'lg:ml-72' : '']"
     />
   </div>
 </template>

@@ -15,11 +15,7 @@ useHead({
   title: pageName,
 });
 
-breadcrumbs().setItems([
-  {
-    label: pageName,
-  },
-]);
+breadcrumbs().clear();
 
 const queryString = ref({
   q: "",
@@ -104,10 +100,6 @@ const onDelete = async (id: number) => {
   }
   refresh();
 };
-
-onBeforeUnmount(() => {
-  apiRefs().updateBack();
-});
 </script>
 
 <template>
