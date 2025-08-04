@@ -29,7 +29,7 @@
           <UFormField label="คำอธิบาย" name="description">
             <UTextarea v-model="state.description" class="w-full" />
           </UFormField>
-          <UFormField label="ราคา(บาท)" name="price" required>
+          <UFormField label="ราคา(฿)" name="price" required>
             <CurrencyInput v-model="state.price" :min="1" class="w-full" />
           </UFormField>
           <UFormField label="จำนวนในสต็อก" name="stock" required>

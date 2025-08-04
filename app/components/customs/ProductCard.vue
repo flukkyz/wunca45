@@ -15,12 +15,41 @@
       <p class="text-right text-2xl font-bold text-red-700">
         <span class="text-xl">฿</span>{{ currencyText(data.price!) }}
       </p>
+      <UButton
+        color="primary"
+        icon="i-fa6-solid-cart-plus"
+        size="xl"
+        class="justify-center px-6"
+        label="เพิ่มไปยังรถเข็น"
+        @click="addToCart"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   data: Product;
 }>();
+
+const localePath = useLocalePath();
+const ct = cart();
+
+const toast = useIToast();
+const addToCart = () => {
+  ct.addToCart(props.data!, 1);
+  toast.onSuccess(
+    "เพิ่มสินค้าลงในรถเข็นแล้ว",
+    `เพิ่มสินค้าลงในรถเข็น ${currencyText(1)} รายการแล้ว`,
+    [
+      {
+        label: "ดูรถเข็น",
+        icon: "i-fa6-solid-cart-shopping",
+        color: "neutral",
+        variant: "soft",
+        to: localePath({ name: "cart" }),
+      },
+    ],
+  );
+};
 </script>

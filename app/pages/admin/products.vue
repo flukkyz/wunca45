@@ -44,7 +44,7 @@ const columns = [
   },
   {
     accessorKey: "price",
-    header: "ราคา(บาท)",
+    header: "ราคา",
   },
   {
     accessorKey: "stock",
@@ -161,16 +161,18 @@ const onDelete = async (id: number) => {
           v-if="row.original.imageUrl"
           :src="row.original.imageUrl"
           alt="Product Image"
-          class="h-12 w-12 rounded object-cover"
+          class="size-20 rounded object-cover"
         />
-        <span v-else class="text-neutral-500">ไม่มีรูปภาพ</span> </template
-      >``
+        <span v-else class="text-neutral-500">ไม่มีรูปภาพ</span>
+      </template>
       <template #price-header="{ column }">
-        <p class="text-right">{{ column.columnDef.header }}</p>
+        <p class="text-right">
+          {{ column.columnDef.header }}
+        </p>
       </template>
       <template #price-cell="{ row }">
         <p class="text-right">
-          {{ currencyText(row.original.price!) }}
+          <span class="text-xs">฿</span>{{ currencyText(row.original.price!) }}
         </p>
       </template>
       <template #stock-header="{ column }">

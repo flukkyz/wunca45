@@ -36,7 +36,6 @@ const onLogin = async () => {
     state.password = "";
     const statusCode = error.value.statusCode;
     [invalid.value, inactive.value] = [statusCode === 401, statusCode === 405];
-    clearInvalid();
   }
   if (status.value === "success") {
     router.push(localePath({ name: "index" }));
@@ -120,7 +119,6 @@ const onLogin = async () => {
               size="lg"
               :label="t('SIGNUP')"
               :disabled="status === 'pending'"
-              :loading="status === 'pending'"
               color="info"
               :to="localePath({ name: 'register' })"
             />
