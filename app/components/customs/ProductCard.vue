@@ -21,7 +21,7 @@
         size="xl"
         class="justify-center px-6"
         label="เพิ่มไปยังรถเข็น"
-        @click="addToCart"
+        @click.stop="addToCart"
       />
     </div>
   </div>
@@ -40,7 +40,7 @@ const addToCart = () => {
   ct.addToCart(props.data!, 1);
   toast.onSuccess(
     "เพิ่มสินค้าลงในรถเข็นแล้ว",
-    `เพิ่มสินค้าลงในรถเข็น ${currencyText(1)} รายการแล้ว`,
+    `เพิ่มสินค้า ${props.data.name} ลงในรถเข็น ${currencyText(1)} รายการแล้ว`,
     [
       {
         label: "ดูรถเข็น",

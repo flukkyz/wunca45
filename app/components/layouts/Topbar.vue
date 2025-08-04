@@ -72,7 +72,12 @@ const items = ref<NavigationMenuItem[]>([
         <UNavigationMenu :items :class="showSidebar ? 'lg:ml-52' : ''" />
       </div>
       <div class="flex items-center gap-2">
-        <UChip v-if="ct.cart.length > 0" :text="ct.cart.length" size="3xl">
+        <UChip
+          v-if="ct.countProducts() > 0"
+          :text="ct.countProducts()"
+          size="3xl"
+          :ui="{ base: 'p-0.5' }"
+        >
           <UButton
             icon="i-fa6-solid-cart-shopping"
             color="neutral"

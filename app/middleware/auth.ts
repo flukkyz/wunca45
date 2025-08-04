@@ -4,5 +4,6 @@ export default defineNuxtRouteMiddleware(async () => {
     return navigateTo(useLocalePath()({ name: "login" }));
   } else {
     apiRefs().initializeBack();
+    cart().getCartCookie();
   }
 });

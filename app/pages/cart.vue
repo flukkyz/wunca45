@@ -78,7 +78,7 @@ const onDeleteSelected = () => {
 <template>
   <UCard
     v-if="ct.cart"
-    class="w-full"
+    class="mb-20 w-full"
     :ui="{
       header: 'p-4 sm:p-4',
       body: 'p-0 sm:p-0',
@@ -115,7 +115,7 @@ const onDeleteSelected = () => {
         />
       </template>
       <template #select-cell="{ row }">
-        <UCheckbox v-model="row.original.select" />
+        <UCheckbox v-model="row.original.select" @change="ct.setCartCookie()" />
       </template>
       <template #product-cell="{ row }">
         <div class="flex items-start gap-2">
@@ -159,6 +159,7 @@ const onDeleteSelected = () => {
               minimumFractionDigits: 0,
               maximumFractionDigits: 0,
             }"
+            @change="ct.setCartCookie()"
           />
         </div>
       </template>

@@ -22,7 +22,7 @@ const scrollListener = () => {
 <template>
   <div
     :class="[
-      'bg-primary fixed right-3 bottom-14 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition-all duration-300 ease-in-out',
+      'bg-primary fixed right-3 bottom-14 z-[9999] flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition-all duration-300 ease-in-out',
       showBtn
         ? 'pointer-events-auto opacity-10 hover:opacity-80'
         : 'pointer-events-none opacity-0',

@@ -35,6 +35,12 @@ watchDebounced(
 
 const { all } = useProduct();
 const { data, status } = await all(queryString);
+
+const viewDetail = (item: Product) => {
+  useRouter().push(
+    localePath({ name: "products-id", params: { id: item.id } }),
+  );
+};
 </script>
 
 <template>
@@ -65,13 +71,12 @@ const { data, status } = await all(queryString);
     <div
       class="grid gap-3 py-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
     >
-      <NuxtLink
+      <CustomsProductCard
         v-for="item in data"
         :key="item.id"
-        :to="localePath({ name: 'products-id', params: { id: item.id } })"
-      >
-        <CustomsProductCard :data="item" />
-      </NuxtLink>
+        :data="item"
+        @click="viewDetail(item)"
+      />
     </div>
   </div>
 </template>
