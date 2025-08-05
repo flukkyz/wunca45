@@ -121,12 +121,6 @@ const onSavePurchaseOrder = async () => {
           <p class="text-sm text-neutral-400">
             {{ ct.countProducts() }} รายการ
           </p>
-          <!-- <UButton
-            size="xs"
-            icon="i-fa6-solid-plus"
-            :label="$t('ADD_', { text: $t('NEW_', { text: modelName }) })"
-            @click="createItem"
-          /> -->
         </div>
       </div>
     </template>
