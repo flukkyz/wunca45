@@ -23,4 +23,6 @@ declare global {
     | "custom";
 
   type Role = "Admin" | "User";
+
+  type OrderStatus = "pending" | "confirm" | "reject" | "cancel";
 }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { find } from "lodash";
 import { UInput } from "#components";
 import Datepicker from "@vuepic/vue-datepicker";
 import type { DatePickerInstance } from "@vuepic/vue-datepicker";
@@ -33,7 +34,7 @@ const props = withDefaults(
     readonly: false,
     prefixIcon: "i-fa6-solid-clock",
     range: false,
-  }
+  },
 );
 
 const datepicker = ref<DatePickerInstance>(null);
@@ -64,7 +65,7 @@ const renderValue = computed(() => {
         ?.concat(
           props.enableSeconds
             ? `:${(props.modelValue as string).split(":")[2]}`
-            : ""
+            : "",
         );
     }
   }
@@ -97,7 +98,7 @@ const pickerValue = computed(() => {
 const emits = defineEmits<{
   (
     e: "update:modelValue" | "input" | "change",
-    value: null | string | string[]
+    value: null | string | string[],
   ): void;
   (e: "clear"): void;
 }>();
@@ -109,17 +110,17 @@ const input = (val: Time | Time[]) => {
           `${usePadStart(item.hours.toString(), 2, "0")}:${usePadStart(
             item.minutes.toString(),
             2,
-            "0"
+            "0",
           )}:${
             props.enableSeconds
               ? `:${usePadStart(item.seconds?.toString(), 2, "0")}`
               : "00"
-          }`
+          }`,
       )
     : `${usePadStart((val as Time).hours.toString(), 2, "0")}:${usePadStart(
         (val as Time).minutes.toString(),
         2,
-        "0"
+        "0",
       )}:${
         props.enableSeconds
           ? `:${usePadStart((val as Time).seconds?.toString(), 2, "0")}`
@@ -196,7 +197,7 @@ const onClearable = (): void => {
       :min-time="minTime"
       :max-time="maxTime"
       :auto-apply="autoApply"
-      :locale="(useFind(locales, { code: locale })!.iso as string)"
+      :locale="find(locales, { code: locale })!.iso as string"
       :select-text="$t('SELECT')"
       :cancel-text="$t('CANCEL')"
       :clearable="false"

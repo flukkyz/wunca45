@@ -9,5 +9,5 @@ definePageMeta({
 
 const localePath = useLocalePath();
 
-useRouter().push(localePath({ name: "admin-products" }));
+useRouter().push(localePath({ name: "admin-orders" }));
 </script>

@@ -37,6 +37,7 @@ watchDebounced(
 const columns = [
   {
     accessorKey: "imageUrl",
+    header: "รูปภาพสินค้า",
   },
   {
     accessorKey: "name",

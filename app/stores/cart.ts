@@ -2,6 +2,7 @@ export const cart = defineStore("cart", {
   state: () => {
     return {
       cart: [] as Cart[],
+      shippingAddress: "",
       hasCart: false,
     };
   },
@@ -15,41 +16,44 @@ export const cart = defineStore("cart", {
     countSelectedProducts() {
       return this.selectedProducts().length;
     },
-    countSelectedProductAmount() {
+    countSelectedProductQuantity() {
       return this.selectedProducts().reduce((total, item) => {
-        return total + item.amount;
+        return total + item.quantity;
       }, 0);
     },
     totalPrice() {
       return this.cart.reduce((total, item) => {
-        return total + item.product.price! * item.amount;
+        return total + item.product.price! * item.quantity;
       }, 0);
     },
     totalSelectedPrice() {
       return this.selectedProducts().reduce((total, item) => {
-        return total + item.product.price! * item.amount;
+        return total + item.product.price! * item.quantity;
       }, 0);
     },
-    addToCart(product: Product, amount: number) {
+    addToCart(product: Product, quantity: number) {
       const existingCartItem = this.cart.find(
         (item) => item.product.id === product.id,
       );
 
       if (existingCartItem) {
-        existingCartItem.amount += amount;
+        existingCartItem.quantity += quantity;
+        if (existingCartItem.quantity > product.stock!) {
+          existingCartItem.quantity = product.stock!;
+        }
       } else {
         this.cart.push({
           product,
-          amount,
+          quantity,
           select: false,
         });
       }
       this.setCartCookie();
     },
-    updateCartItem(productId: number, amount: number) {
+    updateCartItem(productId: number, quantity: number) {
       const cartItem = this.cart.find((item) => item.product.id === productId);
       if (cartItem) {
-        cartItem.amount = amount;
+        cartItem.quantity = quantity;
       }
       this.setCartCookie();
     },
@@ -59,6 +63,10 @@ export const cart = defineStore("cart", {
     },
     clearCart() {
       this.cart = [];
+      this.setCartCookie();
+    },
+    clearSelectItems() {
+      this.cart = this.cart.filter((item) => !item.select);
       this.setCartCookie();
     },
     toggleSelectAll() {
@@ -71,7 +79,12 @@ export const cart = defineStore("cart", {
     setCartCookie() {
       const cartString = getCartCookie();
       cartString.value =
-        this.countProducts() > 0 ? JSON.stringify(this.cart) : null;
+        this.countProducts() > 0
+          ? JSON.stringify({
+              cart: this.cart,
+              shippingAddress: this.shippingAddress,
+            })
+          : null;
     },
     getCartCookie() {
       if (!this.hasCart) {
@@ -79,7 +92,17 @@ export const cart = defineStore("cart", {
           const cartString = getCartCookie();
           try {
             const parsedCart = cartString.value;
-            this.cart = Array.isArray(parsedCart) ? parsedCart : [];
+            if (parsedCart) {
+              const { cart, shippingAddress } =
+                typeof parsedCart !== "string"
+                  ? (parsedCart as { cart: Cart[]; shippingAddress: string })
+                  : JSON.parse(parsedCart);
+              this.cart = cart || [];
+              this.shippingAddress = shippingAddress || "";
+            } else {
+              this.cart = [];
+              this.shippingAddress = "";
+            }
           } catch (error) {
             console.error("Error parsing cart data:", error);
             this.cart = [];
@@ -92,7 +115,10 @@ export const cart = defineStore("cart", {
 });
 
 const getCartCookie = () => {
-  const cartString = useCookie("cart");
+  const auth = authen();
+  const cartString = useCookie(
+    `cart${auth.loggedIn ? `-${auth.user?.username}` : "guest"}`,
+  );
   return cartString;
 };
 const hasCartCookie = (): boolean => {

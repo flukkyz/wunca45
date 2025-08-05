@@ -16,12 +16,23 @@
         <span class="text-xl">฿</span>{{ currencyText(data.price!) }}
       </p>
       <UButton
+        v-if="data.stock! > 0"
         color="primary"
         icon="i-fa6-solid-cart-plus"
         size="xl"
         class="justify-center px-6"
         label="เพิ่มไปยังรถเข็น"
         @click.stop="addToCart"
+      />
+      <UButton
+        v-else
+        color="neutral"
+        icon="i-fa6-solid-ban"
+        size="xl"
+        variant="soft"
+        class="justify-center px-6"
+        label="สินค้าหมด"
+        disabled
       />
     </div>
   </div>

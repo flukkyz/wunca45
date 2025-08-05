@@ -40,7 +40,7 @@ const onLogin = async () => {
       },
     });
     auth.loginAdmin(data.token!);
-    router.push(localePath({ name: "admin-products" }));
+    router.push(localePath({ name: "admin-orders" }));
   } catch (error: any) {
     state.value.password = "";
     const statusCode = error.statusCode;

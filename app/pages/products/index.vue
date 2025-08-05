@@ -2,7 +2,7 @@
 import { watchDebounced } from "@vueuse/core";
 
 definePageMeta({
-  middleware: ["auth"],
+  middleware: ["auth", "user"],
 });
 
 const { t } = useI18n();

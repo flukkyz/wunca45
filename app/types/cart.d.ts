@@ -3,7 +3,7 @@ export { Cart };
 declare global {
   interface Cart {
     product: Product;
-    amount: number;
+    quantity: number;
     select: boolean;
   }
 }

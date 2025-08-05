@@ -27,11 +27,11 @@ const profileItems: DropdownMenuItem[][] = [
     },
   ],
 ];
-if (auth.isAdmin() && profileItems[0]) {
+if (!auth.isAdmin() && profileItems[0]) {
   profileItems[0].push({
-    label: "Admin Management",
-    icon: "i-fa6-solid-shield-halved",
-    to: localePath({ name: "admin" }),
+    label: "รายการสั่งซื้อของฉัน",
+    icon: "i-fa6-solid-bag-shopping",
+    to: localePath({ name: "my-orders" }),
   });
 }
 
@@ -69,11 +69,15 @@ const items = ref<NavigationMenuItem[]>([
         <NuxtLink :to="useLocalePath()({ name: 'index' })">
           <img src="/images/logo.png" class="h-[30px] shrink-0" />
         </NuxtLink>
-        <UNavigationMenu :items :class="showSidebar ? 'lg:ml-52' : ''" />
+        <UNavigationMenu
+          v-if="!auth.isAdmin()"
+          :items
+          :class="showSidebar ? 'lg:ml-52' : ''"
+        />
       </div>
       <div class="flex items-center gap-2">
         <UChip
-          v-if="ct.countProducts() > 0"
+          v-if="ct.countProducts() > 0 && !auth.isAdmin()"
           :text="ct.countProducts()"
           size="3xl"
           :ui="{ base: 'p-0.5' }"
@@ -86,7 +90,7 @@ const items = ref<NavigationMenuItem[]>([
           />
         </UChip>
         <UButton
-          v-else
+          v-else-if="!auth.isAdmin()"
           icon="i-fa6-solid-cart-shopping"
           color="neutral"
           variant="ghost"

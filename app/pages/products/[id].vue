@@ -5,7 +5,7 @@ const modelName = "สินค้าทั้งหมด";
 const ct = cart();
 
 definePageMeta({
-  middleware: ["auth"],
+  middleware: ["auth", "user"],
   validate: async (route) => {
     return typeof route.params.id === "string" && /^\d+$/.test(route.params.id);
   },
@@ -30,14 +30,14 @@ breadcrumbs().setItems([
   },
 ]);
 
-const amount = ref<number>(1);
+const quantity = ref<number>(1);
 
 const toast = useIToast();
 const addToCart = () => {
-  ct.addToCart(data.value!, amount.value);
+  ct.addToCart(data.value!, quantity.value);
   toast.onSuccess(
     "เพิ่มสินค้าลงในรถเข็นแล้ว",
-    `เพิ่มสินค้าลงในรถเข็น ${currencyText(amount.value)} รายการแล้ว`,
+    `เพิ่มสินค้าลงในรถเข็น ${currencyText(quantity.value)} รายการแล้ว`,
     [
       {
         label: "ดูรถเข็น",
@@ -48,7 +48,7 @@ const addToCart = () => {
       },
     ],
   );
-  amount.value = 1; // Reset amount after adding to cart
+  quantity.value = 1; // Reset quantity after adding to cart
 };
 </script>
 
@@ -76,20 +76,32 @@ const addToCart = () => {
         <div class="mt-5 flex items-center gap-3">
           <p>จำนวน</p>
           <UInputNumber
-            v-model="amount"
+            v-model="quantity"
             class="w-32"
             :min="1"
+            :disabled="data.stock! === 0"
             :max="data.stock!"
           />
         </div>
         <div class="mt-5">
           <UButton
+            v-if="data.stock! > 0"
             color="primary"
             icon="i-fa6-solid-cart-plus"
             size="xl"
             class="px-6"
             label="เพิ่มไปยังรถเข็น"
             @click="addToCart"
+          />
+          <UButton
+            v-else
+            color="neutral"
+            icon="i-fa6-solid-ban"
+            size="xl"
+            variant="soft"
+            class="px-6"
+            label="สินค้าหมด"
+            disabled
           />
         </div>
       </div>

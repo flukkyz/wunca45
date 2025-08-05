@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { find } from "lodash";
 import { UInput } from "#components";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
@@ -186,7 +187,7 @@ const onClearable = (): void => {
         :max-date="maxDate"
         :week-start="weekStart"
         inline
-        :locale="useFind(locales, { code: locale })!.iso as string"
+        :locale="find(locales, { code: locale })!.iso as string"
         :select-text="$t('SELECT')"
         :cancel-text="$t('CANCEL')"
         :action-row="{ showNow: true }"

@@ -2,10 +2,11 @@
 import { AlertDialog } from "#components";
 
 definePageMeta({
-  middleware: ["auth"],
+  middleware: ["auth", "user"],
 });
 
 const { t } = useI18n();
+const localePath = useLocalePath();
 
 const modelName = "รถเข็น";
 
@@ -28,7 +29,7 @@ const columns = [
     header: "ราคาต่อชิ้น",
   },
   {
-    accessorKey: "amount",
+    accessorKey: "quantity",
     header: "จำนวน",
   },
   {
@@ -73,6 +74,31 @@ const onDeleteSelected = () => {
     `ลบ ${countSelectedProducts} รายการ ออกจากรถเข็นแล้ว`,
   );
 };
+
+const purchaseOrder = ref<InstanceType<typeof AlertDialog> | null>(null);
+const onPurchaseOrder = () => {
+  purchaseOrder.value?.show();
+};
+
+const onSavePurchaseOrder = async () => {
+  const { error } = await useOrder().create({
+    shippingAddress: ct.shippingAddress,
+    orderDetails: ct.cart.map((item) => ({
+      productId: item.product.id!,
+      quantity: item.quantity,
+    })),
+  });
+  if (error.value) {
+    toast.onError(error.value.statusCode!, error.value.data.message);
+  } else {
+    toast.onSuccess(
+      "สั่งซื้อสินค้าเรียบร้อย",
+      `สั่งซื้อสินค้า ${ct.countSelectedProducts()} รายการเรียบร้อยแล้ว`,
+    );
+    ct.clearSelectItems();
+    useRouter().push(localePath({ name: "my-orders" }));
+  }
+};
 </script>
 
 <template>
@@ -86,12 +112,15 @@ const onDeleteSelected = () => {
   >
     <template #header>
       <div class="flex flex-col gap-3">
-        <div class="flex grow items-center justify-between gap-3">
+        <div class="flex grow items-baseline justify-between gap-3">
           <h2
             class="shrink-0 text-xl leading-tight font-bold text-neutral-900 dark:text-white"
           >
             {{ modelName }}
           </h2>
+          <p class="text-sm text-neutral-400">
+            {{ ct.countProducts() }} รายการ
+          </p>
           <!-- <UButton
             size="xs"
             icon="i-fa6-solid-plus"
@@ -145,13 +174,13 @@ const onDeleteSelected = () => {
           >{{ currencyText(row.original.product.price!) }}
         </p>
       </template>
-      <template #amount-header="{ column }">
+      <template #quantity-header="{ column }">
         <p class="text-right">{{ column.columnDef.header }}</p>
       </template>
-      <template #amount-cell="{ row }">
+      <template #quantity-cell="{ row }">
         <div class="flex w-full justify-end">
           <UInputNumber
-            v-model="row.original.amount"
+            v-model="row.original.quantity"
             :min="1"
             :max="row.original.product.stock"
             class="w-28"
@@ -169,7 +198,9 @@ const onDeleteSelected = () => {
       <template #total-cell="{ row }">
         <p class="text-right">
           <span class="text-xs">฿</span
-          >{{ currencyText(row.original.product.price! * row.original.amount) }}
+          >{{
+            currencyText(row.original.product.price! * row.original.quantity)
+          }}
         </p>
       </template>
       <template #actions-header>
@@ -239,8 +270,8 @@ const onDeleteSelected = () => {
           <div class="flex items-baseline gap-3">
             <p class="">
               รวม ( {{ ct.countSelectedProducts() }} รายการ{{
-                ct.countSelectedProductAmount() > ct.countSelectedProducts()
-                  ? ` ${ct.countSelectedProductAmount()} ชิ้น`
+                ct.countSelectedProductQuantity() > ct.countSelectedProducts()
+                  ? ` ${ct.countSelectedProductQuantity()} ชิ้น`
                   : ""
               }}
               )
@@ -258,6 +289,7 @@ const onDeleteSelected = () => {
             label="สั่งสินค้า"
             color="primary"
             size="xl"
+            @click="onPurchaseOrder"
           />
         </div>
       </UContainer>
@@ -269,4 +301,27 @@ const onDeleteSelected = () => {
     type="delete"
     @confirm="onDeleteSelected"
   />
+  <AlertDialog
+    ref="purchaseOrder"
+    type="confirm"
+    :disable-confirm="!ct.shippingAddress"
+    @confirm="onSavePurchaseOrder"
+  >
+    <div class="flex w-full flex-col gap-2 text-center">
+      <div class="mt-3">
+        <UIcon name="i-fa6-solid-bag-shopping" class="text-primary text-5xl" />
+      </div>
+      <p class="text-error-600 mb-3 text-2xl font-bold">ยืนยันการสั่งซื้อ</p>
+      <div class="flex flex-col gap-1">
+        <p>โปรดกรอกที่อยู่จัดส่งสินค้า</p>
+        <UTextarea
+          v-model="ct.shippingAddress"
+          class="py-3 md:mx-14"
+          size="xl"
+          placeholder="กรุณากรอกที่อยู่จัดส่งสินค้า"
+          @change="ct.setCartCookie()"
+        />
+      </div>
+    </div>
+  </AlertDialog>
 </template>
