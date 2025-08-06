@@ -1,9 +1,15 @@
+import { setUser } from "@sentry/nuxt";
+
 export default defineNuxtRouteMiddleware(async () => {
-  if (!authen().loggedIn) {
+  const auth = authen();
+  if (!auth.loggedIn) {
     abortNavigation();
     return navigateTo(useLocalePath()({ name: "login" }));
   } else {
     apiRefs().initializeBack();
-    cart().getCartCookie();
+    setUser({
+      username: auth.user?.username,
+    });
+    cart().refreshCartKey();
   }
 });

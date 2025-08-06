@@ -76,8 +76,39 @@ export const cart = defineStore("cart", {
       });
       this.setCartCookie();
     },
+
+    /** โหลด cart จาก cookie ปัจจุบัน */
+    loadCartFromCookie() {
+      const cartString = this.getCartCookie();
+      try {
+        const parsedCart = cartString.value;
+        if (parsedCart) {
+          const { cart, shippingAddress } =
+            typeof parsedCart !== "string"
+              ? (parsedCart as { cart: Cart[]; shippingAddress: string })
+              : JSON.parse(parsedCart);
+          this.cart = cart || [];
+          this.shippingAddress = shippingAddress || "";
+        } else {
+          this.cart = [];
+          this.shippingAddress = "";
+        }
+      } catch (error) {
+        console.error("Error parsing cart data:", error);
+        this.cart = [];
+        this.shippingAddress = "";
+      }
+      this.hasCart = true;
+    },
+
+    /** เปลี่ยน key cookie ตาม user ปัจจุบัน และโหลดค่าใหม่ */
+    refreshCartKey() {
+      this.hasCart = false;
+      this.loadCartFromCookie();
+    },
+
     setCartCookie() {
-      const cartString = getCartCookie();
+      const cartString = this.getCartCookie();
       cartString.value =
         this.countProducts() > 0
           ? JSON.stringify({
@@ -86,42 +117,21 @@ export const cart = defineStore("cart", {
             })
           : null;
     },
+
     getCartCookie() {
-      if (!this.hasCart) {
-        if (hasCartCookie()) {
-          const cartString = getCartCookie();
-          try {
-            const parsedCart = cartString.value;
-            if (parsedCart) {
-              const { cart, shippingAddress } =
-                typeof parsedCart !== "string"
-                  ? (parsedCart as { cart: Cart[]; shippingAddress: string })
-                  : JSON.parse(parsedCart);
-              this.cart = cart || [];
-              this.shippingAddress = shippingAddress || "";
-            } else {
-              this.cart = [];
-              this.shippingAddress = "";
-            }
-          } catch (error) {
-            console.error("Error parsing cart data:", error);
-            this.cart = [];
-          }
-          this.hasCart = true;
-        }
-      }
+      const auth = authen();
+      return useCookie(
+        `cart${auth.loggedIn ? `-${auth.user?.username}` : "guest"}`,
+        {
+          maxAge: 60 * 60 * 24 * 7,
+          secure: true,
+        },
+      );
+    },
+
+    hasCartCookie(): boolean {
+      const cartString = this.getCartCookie();
+      return !!cartString.value;
     },
   },
 });
-
-const getCartCookie = () => {
-  const auth = authen();
-  const cartString = useCookie(
-    `cart${auth.loggedIn ? `-${auth.user?.username}` : "guest"}`,
-  );
-  return cartString;
-};
-const hasCartCookie = (): boolean => {
-  const cartString = getCartCookie();
-  return !!cartString.value;
-};

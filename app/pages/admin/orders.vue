@@ -24,6 +24,7 @@ const queryString = ref({
 const filterStatus = ref<string>("all");
 watch(filterStatus, (newStatus) => {
   queryString.value.status = newStatus === "all" ? "" : newStatus;
+  selectedOrderIds.value = [];
 });
 
 const columns = [

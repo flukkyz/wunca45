@@ -1,4 +1,5 @@
 import type { ButtonProps } from "@nuxt/ui";
+import { captureMessage } from "@sentry/nuxt";
 
 export const useIToast = () => {
   const defaultNotifiers: Record<string, any> = {
@@ -31,8 +32,21 @@ export const useIToast = () => {
     title: string | number,
     description?: string,
     actions?: ButtonProps[],
-  ) =>
-    toast.add({
+  ) => {
+    if (id === "error") {
+      captureMessage(`${title}${description ? ` : ${description}` : ""}`, {
+        level: "error",
+        extra: {
+          route: useRoute().fullPath,
+          title,
+          description,
+        },
+        tags: {
+          type: "notifier",
+        },
+      });
+    }
+    return toast.add({
       icon: defaultNotifiers[id].icon,
       color: defaultNotifiers[id].color,
       title: title.toString(),
@@ -43,6 +57,7 @@ export const useIToast = () => {
         title: `text-base font-semibold text-${defaultNotifiers[id].color}-500 dark:text-white`,
       },
     });
+  };
 
   const onSuccess = (
     title: string | number,
